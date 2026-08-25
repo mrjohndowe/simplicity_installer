@@ -23,7 +23,7 @@ jobs:
         run: |
           $ids = $env:PACKAGE_IDS -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
           if ($ids.Count -eq 0) { throw 'Provide at least one package ID.' }
-          if ($ids | Where-Object { $_ -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$' }) { throw 'Package IDs may only contain letters, digits, dots, dashes, and underscores.' }
+          if ($ids | Where-Object { $_ -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*(\|(x64|x86|arm64))?$' }) { throw 'Each package must be an ID, optionally followed by |x64, |x86, or |arm64.' }
           "PACKAGE_IDS=$($ids -join ',')" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Generate the Windows installer
@@ -46,10 +46,14 @@ jobs:
             throw 'winget was not found. Install App Installer from the Microsoft Store, then run this again.'
           }
 
-          foreach (`$package in `$packages) {
-            Write-Host "Installing `$package..." -ForegroundColor Cyan
-            winget install --id `$package --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
-            if (`$LASTEXITCODE -ne 0) { Write-Warning "winget returned exit code `$LASTEXITCODE for `$package. Continuing." }
+          foreach (`$packageSpec in `$packages) {
+            `$parts = `$packageSpec -split '\|', 2
+            `$package = `$parts[0]
+            `$architectureArgs = @()
+            if (`$parts.Count -eq 2) { `$architectureArgs = @('--architecture', `$parts[1]) }
+            Write-Host "Installing `$packageSpec..." -ForegroundColor Cyan
+            winget install --id `$package --exact @architectureArgs --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
+            if (`$LASTEXITCODE -ne 0) { Write-Warning "winget returned exit code `$LASTEXITCODE for `$packageSpec. Continuing." }
           }
 
           Write-Host 'Finished. Review any warnings above for packages that need attention.' -ForegroundColor Green
