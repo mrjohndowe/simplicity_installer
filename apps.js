@@ -22,15 +22,26 @@ const apps = [
   { id: 'SumatraPDF.SumatraPDF', name: 'SumatraPDF', category: 'Office', accent: '#cf4a36', icon: 'Σ' }
 ];
 
+const storageKey = 'stacklift-custom-apps';
+const readCustomApps = () => {
+  try {
+    const stored = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    return Array.isArray(stored) ? stored.filter((app) => app && typeof app.id === 'string' && typeof app.name === 'string') : [];
+  } catch { return []; }
+};
+const customApps = readCustomApps();
+const allApps = () => [...apps, ...customApps];
+const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]);
+const saveCustomApps = () => localStorage.setItem(storageKey, JSON.stringify(customApps));
 const selected = new Set();
 let category = 'All';
-const categories = ['All', ...new Set(apps.map((app) => app.category))];
 const grid = document.querySelector('#app-grid');
 const categoryTabs = document.querySelector('#categories');
 const selectionList = document.querySelector('#selection-list');
 const count = document.querySelector('#selection-count');
 const prepareButton = document.querySelector('#prepare');
 const dialog = document.querySelector('#build-dialog');
+const addAppDialog = document.querySelector('#add-app-dialog');
 
 // On GitHub Pages, convert owner.github.io/repository into the matching
 // repository Actions URL. Locally, this remains a useful link to the YAML file.
@@ -41,16 +52,17 @@ if (location.hostname.endsWith('.github.io')) {
 }
 
 function renderCategories() {
+  const categories = ['All', ...new Set(allApps().map((app) => app.category))];
   categoryTabs.innerHTML = categories.map((item) => `<button class="category-tab ${item === category ? 'active' : ''}" data-category="${item}">${item}</button>`).join('');
 }
 function renderApps() {
   const term = document.querySelector('#search').value.trim().toLowerCase();
-  const displayed = apps.filter((app) => (category === 'All' || app.category === category) && `${app.name} ${app.id}`.toLowerCase().includes(term));
-  grid.innerHTML = displayed.map((app) => `<button class="app-card ${selected.has(app.id) ? 'selected' : ''}" data-id="${app.id}" type="button"><span class="app-icon" style="--accent:${app.accent}">${app.icon}</span><span class="app-meta"><strong>${app.name}</strong><small>${app.id}</small></span><span class="check" aria-hidden="true">✓</span></button>`).join('') || '<p class="no-results">No matching apps. Add new entries in <code>apps.js</code>.</p>';
+  const displayed = allApps().filter((app) => (category === 'All' || app.category === category) && `${app.name} ${app.id}`.toLowerCase().includes(term));
+  grid.innerHTML = displayed.map((app) => `<button class="app-card ${selected.has(app.id) ? 'selected' : ''}" data-id="${escapeHtml(app.id)}" type="button"><span class="app-icon" style="--accent:${escapeHtml(app.accent)}">${escapeHtml(app.icon)}</span><span class="app-meta"><strong>${escapeHtml(app.name)}</strong><small>${escapeHtml(app.id)}</small></span><span class="check" aria-hidden="true">✓</span></button>`).join('') || '<p class="no-results">No matching apps. Use “Add it” below to create one in this browser.</p>';
 }
 function renderSelection() {
-  const chosen = apps.filter((app) => selected.has(app.id));
-  selectionList.innerHTML = chosen.length ? chosen.map((app) => `<div class="selected-item"><span class="mini-icon" style="--accent:${app.accent}">${app.icon}</span><span>${app.name}</span><button data-remove="${app.id}" aria-label="Remove ${app.name}">×</button></div>`).join('') : '<p class="empty-state">No apps selected yet.</p>';
+  const chosen = allApps().filter((app) => selected.has(app.id));
+  selectionList.innerHTML = chosen.length ? chosen.map((app) => `<div class="selected-item"><span class="mini-icon" style="--accent:${escapeHtml(app.accent)}">${escapeHtml(app.icon)}</span><span>${escapeHtml(app.name)}</span><button data-remove="${escapeHtml(app.id)}" aria-label="Remove ${escapeHtml(app.name)}">×</button></div>`).join('') : '<p class="empty-state">No apps selected yet.</p>';
   count.textContent = chosen.length;
   prepareButton.disabled = !chosen.length;
 }
@@ -61,7 +73,24 @@ grid.addEventListener('click', (event) => { const card = event.target.closest('[
 selectionList.addEventListener('click', (event) => { if (event.target.dataset.remove) { selected.delete(event.target.dataset.remove); render(); } });
 document.querySelector('#search').addEventListener('input', renderApps);
 document.querySelector('#clear').addEventListener('click', () => { selected.clear(); render(); });
-prepareButton.addEventListener('click', () => { document.querySelector('#package-output').value = apps.filter((app) => selected.has(app.id)).map((app) => app.id).join(','); dialog.showModal(); });
+prepareButton.addEventListener('click', () => { document.querySelector('#package-output').value = allApps().filter((app) => selected.has(app.id)).map((app) => app.id).join(','); dialog.showModal(); });
 document.querySelector('#close-dialog').addEventListener('click', () => dialog.close());
 document.querySelector('#copy').addEventListener('click', async () => { await navigator.clipboard.writeText(document.querySelector('#package-output').value); document.querySelector('#copy').textContent = 'Copied!'; setTimeout(() => { document.querySelector('#copy').textContent = 'Copy package IDs'; }, 1600); });
+document.querySelector('#add-app').addEventListener('click', () => { document.querySelector('#add-app-form').reset(); document.querySelector('#custom-error').textContent = ''; addAppDialog.showModal(); });
+document.querySelector('#close-add-app').addEventListener('click', () => addAppDialog.close());
+document.querySelector('#add-app-form').addEventListener('submit', (event) => {
+  event.preventDefault();
+  const name = document.querySelector('#custom-name').value.trim();
+  const id = document.querySelector('#custom-id').value.trim();
+  const categoryName = document.querySelector('#custom-category').value.trim() || 'Custom';
+  const error = document.querySelector('#custom-error');
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(id)) { error.textContent = 'Enter a valid winget package ID (letters, numbers, dots, dashes, and underscores only).'; return; }
+  if (allApps().some((app) => app.id.toLowerCase() === id.toLowerCase())) { error.textContent = 'That package ID is already in your catalog.'; return; }
+  customApps.push({ id, name, category: categoryName, accent: '#526b6a', icon: name.slice(0, 2).toUpperCase() });
+  saveCustomApps();
+  selected.add(id);
+  category = 'All';
+  addAppDialog.close();
+  render();
+});
 render();

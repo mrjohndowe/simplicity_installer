@@ -11,7 +11,17 @@ An open-source, GitHub Pages-friendly alternative to a multi-app Windows setup t
 
 The generated script calls `winget install` with the exact app IDs, uses silent installation where supported, accepts package/source agreements, and continues if a package fails. Always review generated scripts before running them.
 
-## Add or change apps
+## Add apps from the website
+
+Visitors do not need to download or edit this repository to use additional applications. On the catalog page, select **Can't find an app? Add it**, enter a display name and exact `winget` package ID, then save it. The custom app is kept in that browser's local storage, is selected automatically, and is included in the next GitHub Actions build. It does not modify the public catalog for other visitors.
+
+Before adding an ID, validate it on Windows:
+
+```powershell
+winget show --id Publisher.Package --exact
+```
+
+## Add or change the shared catalog
 
 Edit the `apps` list at the top of [apps.js](apps.js). Every entry needs a valid `winget` package ID, name, category, accent color, and short icon label. Validate an ID on Windows with:
 

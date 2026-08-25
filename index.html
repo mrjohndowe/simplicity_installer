@@ -31,7 +31,10 @@
         </div>
         <div class="catalog-layout">
           <div id="categories" class="category-tabs" aria-label="App categories"></div>
-          <div id="app-grid" class="app-grid" aria-live="polite"></div>
+          <div>
+            <div id="app-grid" class="app-grid" aria-live="polite"></div>
+            <button id="add-app" class="add-app-button" type="button"><span aria-hidden="true">+</span> Can't find an app? Add it</button>
+          </div>
         </div>
       </section>
 
@@ -68,6 +71,19 @@
       <textarea id="package-output" readonly aria-label="Selected package IDs"></textarea>
       <button id="copy" class="primary-button" type="button">Copy package IDs</button>
       <a class="workflow-link" id="workflow-link" href=".github/workflows/build-installer.yml" target="_blank" rel="noreferrer">Open the workflow <span aria-hidden="true">↗</span></a>
+    </dialog>
+    <dialog id="add-app-dialog" aria-labelledby="add-app-title">
+      <button class="dialog-close" id="close-add-app" aria-label="Close">×</button>
+      <p class="eyebrow">CUSTOM APP</p>
+      <h2 id="add-app-title">Add an app to your list</h2>
+      <p>Enter its exact <code>winget</code> package ID. Your app stays in this browser and can be selected for every future build.</p>
+      <form id="add-app-form">
+        <label>App name<input id="custom-name" name="name" required maxlength="60" placeholder="Example: Obsidian" /></label>
+        <label>winget package ID<input id="custom-id" name="packageId" required pattern="[A-Za-z0-9][A-Za-z0-9._-]*" placeholder="Example: Obsidian.Obsidian" /></label>
+        <label>Category (optional)<input id="custom-category" name="category" maxlength="30" placeholder="Example: Notes" /></label>
+        <p id="custom-error" class="form-error" role="alert"></p>
+        <button class="primary-button" type="submit">Save and select app <span aria-hidden="true">→</span></button>
+      </form>
     </dialog>
     <script src="apps.js"></script>
   </body>
