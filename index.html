@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Build a custom Windows app installer with GitHub Actions." />
+    <title>StackLift | Your Windows setup, made simple</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="StackLift home"><span>stack</span>lift</a>
+      <a class="header-link" href="#how-it-works">How it works</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <p class="eyebrow">OPEN-SOURCE WINDOWS SETUP</p>
+        <h1>Pick your apps.<br /><em>Build your setup.</em></h1>
+        <p class="hero-copy">Choose the software you need. GitHub Actions creates one clean, repeatable Windows installer—ready whenever you are.</p>
+        <a class="scroll-link" href="#catalog">Browse the catalog <span aria-hidden="true">↓</span></a>
+      </section>
+
+      <section class="catalog-section" id="catalog" aria-labelledby="catalog-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">STEP 01</p>
+            <h2 id="catalog-title">Choose your stack</h2>
+          </div>
+          <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Search apps" aria-label="Search apps" /></label>
+        </div>
+        <div class="catalog-layout">
+          <div id="categories" class="category-tabs" aria-label="App categories"></div>
+          <div id="app-grid" class="app-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="build-section" id="build" aria-labelledby="build-title">
+        <div class="build-copy">
+          <p class="eyebrow">STEP 02</p>
+          <h2 id="build-title">Your installer<br />is <em>almost ready.</em></h2>
+          <p>We use GitHub Actions to turn your selected app IDs into a readable PowerShell installer. Nothing is installed until you run it on your Windows PC.</p>
+        </div>
+        <aside class="selection-panel">
+          <div class="selection-topline"><span>YOUR SELECTION</span><button id="clear" type="button">Clear all</button></div>
+          <div id="selection-list" class="selection-list"><p class="empty-state">No apps selected yet.</p></div>
+          <p class="selection-count"><strong id="selection-count">0</strong> applications selected</p>
+          <button id="prepare" class="primary-button" type="button" disabled>Prepare GitHub build <span aria-hidden="true">→</span></button>
+        </aside>
+      </section>
+
+      <section class="how-section" id="how-it-works" aria-labelledby="how-title">
+        <p class="eyebrow">HOW IT WORKS</p>
+        <h2 id="how-title">One small workflow.<br />A fresh machine, <em>done right.</em></h2>
+        <ol class="steps">
+          <li><span>01</span><h3>Select</h3><p>Choose any apps from the editable catalog.</p></li>
+          <li><span>02</span><h3>Build</h3><p>Run the GitHub workflow with your copied package IDs.</p></li>
+          <li><span>03</span><h3>Install</h3><p>Download its artifact and run the generated installer.</p></li>
+        </ol>
+      </section>
+    </main>
+
+    <dialog id="build-dialog" aria-labelledby="dialog-title">
+      <button class="dialog-close" id="close-dialog" aria-label="Close">×</button>
+      <p class="eyebrow">READY TO BUILD</p>
+      <h2 id="dialog-title">Send this list to GitHub Actions</h2>
+      <p>Copy the IDs below, open <strong>Actions → Build custom installer → Run workflow</strong>, paste them into <em>package_ids</em>, and choose <strong>Run workflow</strong>. Your installer will appear as an artifact when the run finishes.</p>
+      <textarea id="package-output" readonly aria-label="Selected package IDs"></textarea>
+      <button id="copy" class="primary-button" type="button">Copy package IDs</button>
+      <a class="workflow-link" id="workflow-link" href=".github/workflows/build-installer.yml" target="_blank" rel="noreferrer">Open the workflow <span aria-hidden="true">↗</span></a>
+    </dialog>
+    <script src="apps.js"></script>
+  </body>
+</html>
