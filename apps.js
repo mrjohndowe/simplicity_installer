@@ -22,6 +22,16 @@ const apps = [
   { id: 'SumatraPDF.SumatraPDF', name: 'SumatraPDF', category: 'Office', accent: '#cf4a36', icon: 'Σ' }
 ];
 
+const appLogos = {
+  'Google.Chrome': 'google-chrome.svg', 'Mozilla.Firefox': 'firefox.svg', 'Brave.Brave': 'brave.svg',
+  'VideoLAN.VLC': 'vlc-media-player.svg', 'Audacity.Audacity': 'audacity.svg', 'Spotify.Spotify': 'spotify.svg',
+  'Discord.Discord': 'discord.svg', 'Zoom.Zoom': 'zoom-workplace.svg', 'SlackTechnologies.Slack': 'slack.svg',
+  '7zip.7zip': '7-zip.svg', 'voidtools.Everything': 'everything.svg', 'ShareX.ShareX': 'sharex.svg',
+  'Notepad++.Notepad++': 'notepad-plus-plus.svg', 'Microsoft.VisualStudioCode': 'vs-code.svg', 'Git.Git': 'git.svg',
+  'Python.Python.3.13': 'python.svg', 'GIMP.GIMP': 'gimp.svg', 'Inkscape.Inkscape': 'inkscape.svg',
+  'BlenderFoundation.Blender': 'blender.svg', 'LibreOffice.LibreOffice': 'libreoffice.svg', 'SumatraPDF.SumatraPDF': 'sumatrapdf.svg'
+};
+
 const storageKey = 'stacklift-custom-apps';
 const readCustomApps = () => {
   try {
@@ -58,11 +68,11 @@ function renderCategories() {
 function renderApps() {
   const term = document.querySelector('#search').value.trim().toLowerCase();
   const displayed = allApps().filter((app) => (category === 'All' || app.category === category) && `${app.name} ${app.id}`.toLowerCase().includes(term));
-  grid.innerHTML = displayed.map((app) => `<button class="app-card ${selected.has(app.id) ? 'selected' : ''}" data-id="${escapeHtml(app.id)}" type="button"><span class="app-icon" style="--accent:${escapeHtml(app.accent)}">${escapeHtml(app.icon)}</span><span class="app-meta"><strong>${escapeHtml(app.name)}</strong><small>${escapeHtml(app.id)}</small></span><span class="check" aria-hidden="true">✓</span></button>`).join('') || '<p class="no-results">No matching apps. Use “Add it” below to create one in this browser.</p>';
+  grid.innerHTML = displayed.map((app) => `<button class="app-card ${selected.has(app.id) ? 'selected' : ''}" data-id="${escapeHtml(app.id)}" type="button">${appLogos[app.id] ? `<span class="app-icon"><img class="app-logo" src="logos/${appLogos[app.id]}" alt="" /></span>` : `<span class="app-icon" style="--accent:${escapeHtml(app.accent)}">${escapeHtml(app.icon)}</span>`}<span class="app-meta"><strong>${escapeHtml(app.name)}</strong><small>${escapeHtml(app.id)}</small></span><span class="check" aria-hidden="true">✓</span></button>`).join('') || '<p class="no-results">No matching apps. Use “Add it” below to create one in this browser.</p>';
 }
 function renderSelection() {
   const chosen = allApps().filter((app) => selected.has(app.id));
-  selectionList.innerHTML = chosen.length ? chosen.map((app) => `<div class="selected-item"><span class="mini-icon" style="--accent:${escapeHtml(app.accent)}">${escapeHtml(app.icon)}</span><span>${escapeHtml(app.name)}</span><button data-remove="${escapeHtml(app.id)}" aria-label="Remove ${escapeHtml(app.name)}">×</button></div>`).join('') : '<p class="empty-state">No apps selected yet.</p>';
+  selectionList.innerHTML = chosen.length ? chosen.map((app) => `<div class="selected-item">${appLogos[app.id] ? `<span class="mini-icon"><img class="app-logo" src="logos/${appLogos[app.id]}" alt="" /></span>` : `<span class="mini-icon" style="--accent:${escapeHtml(app.accent)}">${escapeHtml(app.icon)}</span>`}<span>${escapeHtml(app.name)}</span><button data-remove="${escapeHtml(app.id)}" aria-label="Remove ${escapeHtml(app.name)}">×</button></div>`).join('') : '<p class="empty-state">No apps selected yet.</p>';
   count.textContent = chosen.length;
   prepareButton.disabled = !chosen.length;
 }

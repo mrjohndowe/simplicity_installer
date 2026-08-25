@@ -31,6 +31,10 @@ winget show --id Publisher.Package --exact
 
 Keep the catalog’s IDs limited to trusted packages. This project does not store vendor installers, install bundled offers, or require a third-party backend.
 
+## Logo assets
+
+The catalog uses local SVG logo assets in [`logos/`](logos/), with source and license information in [`logos/ATTRIBUTION.md`](logos/ATTRIBUTION.md). They are used to identify the corresponding software; brand names and marks remain the property of their respective owners.
+
 ## Why GitHub Actions?
 
 GitHub Pages is static, so it cannot securely build a personalized executable from browser selections by itself. This project keeps the selection in the browser and uses a manual Action run to build a transparent installer artifact in your own repository. That makes the build history and exact selected package IDs auditable.
