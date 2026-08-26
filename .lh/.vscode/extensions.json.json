@@ -1,0 +1,22 @@
+{
+    "sourceFile": ".vscode/extensions.json",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1787705115075,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1787705163376,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n {\r\n     \"recommendations\": [\r\n-        \"akiyamasho.yet-another-markdown-editor\"\r\n+        \"akiyamasho.yet-another-markdown-editor\",\r\n+        \"cirocfc.yet-another-vscode-extension-pack\"\r\n     ]\r\n }\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1787705115075,
+            "name": "Commit-0",
+            "content": "{\r\n    \"recommendations\": [\r\n        \"akiyamasho.yet-another-markdown-editor\"\r\n    ]\r\n}"
+        }
+    ]
+}
