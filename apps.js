@@ -25,7 +25,7 @@ const apps = [
 // Device utilities comparable to the HORI Device Manager utility shown in the
 // reference. Only packages available from winget can be selected for builds.
 apps.push(
-  { id: 'Hori.DeviceManager', name: 'HORI Device Manager VOL.2', category: 'Device & RGB', accent: '#ed1c24', icon: 'H', unavailable: true, note: 'Version 1.0.28.13 — manual download required' },
+  { id: 'HORI.DeviceManager.Vol2', name: 'HORI Device Manager VOL.2', category: 'Device & RGB', accent: '#ed1c24', icon: 'H', note: 'Version 1.0.28.13 — interactive administrator install' },
   { id: 'Logitech.GHUB', name: 'Logitech G HUB', category: 'Device & RGB', accent: '#00b8fc', icon: 'LG' },
   { id: 'Corsair.iCUE.5', name: 'Corsair iCUE', category: 'Device & RGB', accent: '#f6b700', icon: 'C' },
   { id: 'SteelSeries.GG', name: 'SteelSeries GG', category: 'Device & RGB', accent: '#f04f23', icon: 'GG' },
