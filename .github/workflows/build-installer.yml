@@ -38,6 +38,9 @@ jobs:
           param()
 
           `$ErrorActionPreference = 'Stop'
+          `$horiPackageId = 'HORI.DeviceManager.Vol2'
+          `$horiInstallerName = 'HORI Device Manager VOL.2 1.0.28.13.exe'
+          `$horiSha256 = '69C86AF68E9609A9AC2126DFF7F55D619A4F2572D62CFA1342DBD3AC6D86C200'
           `$packages = @(
           $($quotedIds -join ",`n")
           )
@@ -47,6 +50,15 @@ jobs:
           }
 
           foreach (`$package in `$packages) {
+            if (`$package -eq `$horiPackageId) {
+              `$horiInstaller = Join-Path `$PSScriptRoot `$horiInstallerName
+              if (-not (Test-Path -LiteralPath `$horiInstaller)) { throw "`$horiInstallerName was not included with this installer." }
+              `$actualHash = (Get-FileHash -LiteralPath `$horiInstaller -Algorithm SHA256).Hash
+              if (`$actualHash -ne `$horiSha256) { throw 'HORI installer hash verification failed. The file was not run.' }
+              Write-Host 'Launching HORI Device Manager Vol.2. Approve the Windows administrator prompt and complete its installer.' -ForegroundColor Yellow
+              Start-Process -FilePath `$horiInstaller -Verb RunAs -Wait
+              continue
+            }
             Write-Host "Installing `$package..." -ForegroundColor Cyan
             winget install --id `$package --exact --silent --accept-package-agreements --accept-source-agreements --disable-interactivity
             if (`$LASTEXITCODE -ne 0) { Write-Warning "winget returned exit code `$LASTEXITCODE for `$package. Continuing." }
@@ -68,12 +80,26 @@ jobs:
           Selected packages: $env:PACKAGE_IDS
           "@ | Set-Content -Path README.md -Encoding utf8
 
+      - name: Assemble installer files
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path output | Out-Null
+          Copy-Item Install-SelectedApps.ps1, README.md -Destination output
+
+      - name: Verify and include HORI Device Manager Vol.2
+        if: contains(inputs.package_ids, 'HORI.DeviceManager.Vol2')
+        shell: pwsh
+        run: |
+          $installer = 'assets/installers/HORI Device Manager VOL.2 1.0.28.13.exe'
+          $expectedHash = '69C86AF68E9609A9AC2126DFF7F55D619A4F2572D62CFA1342DBD3AC6D86C200'
+          if (-not (Test-Path -LiteralPath $installer)) { throw 'HORI installer asset is missing from the repository.' }
+          if ((Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash -ne $expectedHash) { throw 'HORI installer asset hash does not match the approved version.' }
+          Copy-Item -LiteralPath $installer -Destination output
+
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
           name: StackLift-installer
-          path: |
-            Install-SelectedApps.ps1
-            README.md
+          path: output
           if-no-files-found: error
           retention-days: 14
