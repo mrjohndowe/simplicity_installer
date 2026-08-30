@@ -16,6 +16,9 @@ jobs:
     name: Create installer
     runs-on: windows-latest
     steps:
+      - name: Check out installer assets
+        uses: actions/checkout@v4
+
       - name: Validate selected package IDs
         shell: pwsh
         env:
