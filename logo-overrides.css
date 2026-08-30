@@ -1,0 +1,17 @@
+/* Load after styles.css: image-based brand marks should not sit in a tile. */
+.app-icon.app-icon-image {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
+.app-icon.app-icon-image .app-logo {
+  padding: 0;
+}
+
+.selected-item .app-icon.app-icon-image {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
