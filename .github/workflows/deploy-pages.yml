@@ -1,9 +1,9 @@
 name: Publish GitHub Pages
 
 on:
-  release:
-    types:
-      - published
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -17,16 +17,14 @@ concurrency:
 
 jobs:
   deploy:
-    name: Deploy released site
+    name: Deploy current site
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the released version
+      - name: Check out the current site
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.release.tag_name || github.sha }}
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

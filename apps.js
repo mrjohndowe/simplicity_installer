@@ -22,6 +22,52 @@ const apps = [
   { id: 'SumatraPDF.SumatraPDF', name: 'SumatraPDF', category: 'Office', accent: '#cf4a36', icon: 'Σ' }
 ];
 
+// Device utilities comparable to the HORI Device Manager utility shown in the
+// reference. Only packages available from winget can be selected for builds.
+apps.push(
+  { id: 'Hori.DeviceManager', name: 'HORI Device Manager VOL.2', category: 'Device & RGB', accent: '#ed1c24', icon: 'H', unavailable: true, note: 'Version 1.0.28.13 — manual download required' },
+  { id: 'Logitech.GHUB', name: 'Logitech G HUB', category: 'Device & RGB', accent: '#00b8fc', icon: 'LG' },
+  { id: 'Corsair.iCUE.5', name: 'Corsair iCUE', category: 'Device & RGB', accent: '#f6b700', icon: 'C' },
+  { id: 'SteelSeries.GG', name: 'SteelSeries GG', category: 'Device & RGB', accent: '#f04f23', icon: 'GG' },
+  { id: 'WhirlwindFX.SignalRgb', name: 'SignalRGB', category: 'Device & RGB', accent: '#7556ff', icon: 'SR' },
+  { id: 'OpenRGB.OpenRGB', name: 'OpenRGB', category: 'Device & RGB', accent: '#00aa88', icon: 'OR' },
+  { id: 'Elgato.StreamDeck', name: 'Elgato Stream Deck', category: 'Device & RGB', accent: '#111111', icon: 'ED' }
+);
+
+const appLogos = {
+  'Google.Chrome': 'google-chrome.svg',
+  'Mozilla.Firefox': 'firefox.svg',
+  'Brave.Brave': 'brave.svg',
+  'VideoLAN.VLC': 'vlc-media-player.svg',
+  'Audacity.Audacity': 'audacity.svg',
+  'Spotify.Spotify': 'spotify.svg',
+  'Discord.Discord': 'discord.svg',
+  'Zoom.Zoom': 'zoom-workplace.svg',
+  'SlackTechnologies.Slack': 'slack.svg',
+  '7zip.7zip': '7-zip.svg',
+  'voidtools.Everything': 'everything.svg',
+  'ShareX.ShareX': 'sharex.svg',
+  'Notepad++.Notepad++': 'notepad-plus-plus.svg',
+  'Microsoft.VisualStudioCode': 'vs-code.svg',
+  'Git.Git': 'git.svg',
+  'Python.Python.3.13': 'python.svg',
+  'GIMP.GIMP': 'gimp.svg',
+  'Inkscape.Inkscape': 'inkscape.svg',
+  'BlenderFoundation.Blender': 'blender.svg',
+  'LibreOffice.LibreOffice': 'libreoffice.svg',
+  'SumatraPDF.SumatraPDF': 'sumatrapdf.svg',
+  'Corsair.iCUE.5': 'corsair-icue.svg',
+  'SteelSeries.GG': 'steelseries-gg.svg',
+  'WhirlwindFX.SignalRgb': 'signalrgb.ico',
+  'Elgato.StreamDeck': 'elgato-stream-deck.svg'
+};
+
+function appIcon(app) {
+  const logo = appLogos[app.id];
+  if (!logo) return `<span class="app-icon" style="--accent:${app.accent}">${app.icon}</span>`;
+  return `<span class="app-icon app-icon-image" style="--accent:${app.accent}"><img class="app-logo" src="logos/${logo}" alt="" onerror="this.remove();" /><span class="icon-fallback">${app.icon}</span></span>`;
+}
+
 const selected = new Set();
 let category = 'All';
 const categories = ['All', ...new Set(apps.map((app) => app.category))];
@@ -46,11 +92,11 @@ function renderCategories() {
 function renderApps() {
   const term = document.querySelector('#search').value.trim().toLowerCase();
   const displayed = apps.filter((app) => (category === 'All' || app.category === category) && `${app.name} ${app.id}`.toLowerCase().includes(term));
-  grid.innerHTML = displayed.map((app) => `<button class="app-card ${selected.has(app.id) ? 'selected' : ''}" data-id="${app.id}" type="button"><span class="app-icon" style="--accent:${app.accent}">${app.icon}</span><span class="app-meta"><strong>${app.name}</strong><small>${app.id}</small></span><span class="check" aria-hidden="true">✓</span></button>`).join('') || '<p class="no-results">No matching apps. Add new entries in <code>apps.js</code>.</p>';
+  grid.innerHTML = displayed.map((app) => `<button class="app-card ${selected.has(app.id) ? 'selected' : ''} ${app.unavailable ? 'unavailable' : ''}" data-id="${app.id}" type="button" ${app.unavailable ? 'disabled title="This program is not currently available through winget"' : ''}>${appIcon(app)}<span class="app-meta"><strong>${app.name}</strong><small>${app.note || app.id}</small></span><span class="check" aria-hidden="true">✓</span></button>`).join('') || '<p class="no-results">No matching apps. Add new entries in <code>apps.js</code>.</p>';
 }
 function renderSelection() {
   const chosen = apps.filter((app) => selected.has(app.id));
-  selectionList.innerHTML = chosen.length ? chosen.map((app) => `<div class="selected-item"><span class="mini-icon" style="--accent:${app.accent}">${app.icon}</span><span>${app.name}</span><button data-remove="${app.id}" aria-label="Remove ${app.name}">×</button></div>`).join('') : '<p class="empty-state">No apps selected yet.</p>';
+  selectionList.innerHTML = chosen.length ? chosen.map((app) => `<div class="selected-item">${appIcon(app)}<span>${app.name}</span><button data-remove="${app.id}" aria-label="Remove ${app.name}">×</button></div>`).join('') : '<p class="empty-state">No apps selected yet.</p>';
   count.textContent = chosen.length;
   prepareButton.disabled = !chosen.length;
 }
